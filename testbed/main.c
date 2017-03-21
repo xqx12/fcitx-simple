@@ -99,8 +99,7 @@ int main(int argc, char* argv[])
     bind_textdomain_codeset("fcitx", "UTF-8");
     textdomain("fcitx");
 
-    FcitxLogSetLevel(FCITX_NONE);
-
+    FcitxLogSetLevel(FCITX_DEBUG);
     int c;
     char* addonList = NULL, *sandboxDirectory = NULL;
     char *buf = NULL, *buf1 = NULL;
