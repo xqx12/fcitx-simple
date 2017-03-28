@@ -37,6 +37,7 @@ int FcitxSimpleSendKeyEvent(FcitxInstance *instance, boolean release, FcitxKeySy
 
     int result = 0;
     FcitxSimpleSendRequest(instance, &request, &result);
+
     return result;
 }
 
@@ -79,3 +80,50 @@ void FcitxSimpleEnd(FcitxInstance* instance)
 
     FcitxSimpleSendRequest(instance, &request, NULL);
 }
+
+FCITX_EXPORT_API
+int FcitxSimpleSendAndHandle(FcitxInstance *instance, boolean release, FcitxKeySym key, 
+        unsigned int state, unsigned int keycode, void* fm)
+{
+    FcitxSimpleRequest request;
+    request.type = release ? SE_KeyEventRelease : SE_KeyEventPress;
+    request.key = key;
+    request.state = state;
+    request.keycode = keycode;
+
+#ifdef USE_QUEUE
+    int result = 0;
+    /*FcitxSimpleSendRequest(instance, &request, &result);*/
+    FcitxSimpleCallQueue* queue = FcitxSimpleGetQueue(instance);
+    FcitxSimpleCallQueueItem *item = FcitxSimpleCallQueueEnqueue(queue, &request, &result);
+
+    /*SimpleModuleProcessEvent( (void*)fm );*/
+    /*FcitxSimpleFrontendProcessKey(instance, &request);*/
+    FcitxSimpleCallQueueItem *item1 = NULL;
+    item1 = FcitxSimpleCallQueueDequeue(queue);
+    int *res = (int*) item1->result;
+    switch(item1->request->type) {
+        case SE_KeyEventRelease:
+        case SE_KeyEventPress:
+            printf("process key--\n");
+            *res = FcitxSimpleFrontendProcessKey(instance, item1->request);
+            break;
+    }
+
+#else
+
+    int result = 0;
+    /*FcitxSimpleFrontendProcessKey(instance, &request);*/
+    switch(request.type) {
+        case SE_KeyEventRelease:
+        case SE_KeyEventPress:
+            printf("process key--\n");
+            result = FcitxSimpleFrontendProcessKey(instance, &request);
+            break;
+    }
+#endif
+    
+
+    return result;
+}
+

@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 #include <fcitx/instance.h>
+#include "instance-internal.h"
 #include <fcitx/hook.h>
 #include "simple-api.h"
 
@@ -178,7 +179,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    instance = FcitxInstanceCreatePause(&sem, 8, args, -1);
+    instance = FcitxInstanceCreatePauseSingleThread(&sem, 8, args, -1);
     if (sem_trywait(&sem) == 0)
         goto option_error_end;
 
@@ -197,9 +198,20 @@ int main(int argc, char* argv[])
         unsigned int state = 0;
         FcitxHotkeyParseKey(buf1, &sym, &state);
 
-        if (FcitxSimpleSendKeyEvent(instance, false, sym, state, 0) == 0) {
-            fprintf(stderr, "FORWARD:%s\n", buf1);
+        FcitxAddon **pmodule;
+        for( pmodule = (FcitxAddon**) utarray_front(&(instance->eventmodules));
+                pmodule != NULL; 
+                pmodule = (FcitxAddon**) utarray_next(&instance->eventmodules, pmodule)) {
+            printf("%x\n", (*pmodule)->addonInstance);
+            printf("key is %s: %d\n", buf1, sym);
+
+            FcitxSimpleSendAndHandle(instance, false, sym, state, 0, (*pmodule)->addonInstance);
         }
+
+        /*continue;*/
+        /*if (FcitxSimpleSendKeyEvent(instance, false, sym, state, 0) == 0) {*/
+            /*fprintf(stderr, "FORWARD:%s\n", buf1);*/
+        /*}*/
 
         usleep(1000);
     }
