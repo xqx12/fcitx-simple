@@ -27,6 +27,7 @@
 #include "instance-internal.h"
 #include <fcitx/hook.h>
 #include "simple-api.h"
+#include "hotkey-list.h"
 
 FcitxInstance* instance = NULL;
 
@@ -89,6 +90,48 @@ static void TestbedCallback(void* arg, FcitxSimpleEvent* event) {
     }
 
 #undef TESTBED_CASE
+}
+
+int ParseKey(char* buf)
+{
+    if( !instance ) return -1;
+
+    FcitxKeySym sym = FcitxKey_None;
+    unsigned int state = 0;
+    FcitxHotkeyParseKey(buf, &sym, &state);
+
+    FcitxAddon **pmodule;
+    for( pmodule = (FcitxAddon**) utarray_front(&(instance->eventmodules));
+            pmodule != NULL; 
+            pmodule = (FcitxAddon**) utarray_next(&instance->eventmodules, pmodule)) {
+        printf("%x\n", (*pmodule)->addonInstance);
+        printf("key is %s: %d\n", buf, sym);
+
+        FcitxSimpleSendAndHandle(instance, false, sym, state, 0, (*pmodule)->addonInstance);
+    }
+
+}
+
+char* getKeyStringbyInt(int index)
+{
+    if( index > 0x20 && index <= 0x7e) {
+        char *p;
+        p = malloc(sizeof(char)*2);
+        p[0] = index;
+        p[1] = '\0';
+        return p;
+    }
+    int i = 0;
+    while(1) {
+        if(!keyList[i].code)
+            break;
+
+        if(keyList[i].code == index)
+            return strdup(keyList[i].strKey);
+
+        i++;
+    }
+    return NULL;
 }
 
 int main(int argc, char* argv[])
@@ -190,34 +233,20 @@ int main(int argc, char* argv[])
     if (imname) {
         FcitxSimpleSetCurrentIM(instance, imname);
     }
-    while (getline(&buf, &len, fp) != -1) {
-        fcitx_utils_free(buf1);
-        buf1 = fcitx_utils_trim(buf);
-
-        FcitxKeySym sym = FcitxKey_None;
-        unsigned int state = 0;
-        FcitxHotkeyParseKey(buf1, &sym, &state);
-
-        FcitxAddon **pmodule;
-        for( pmodule = (FcitxAddon**) utarray_front(&(instance->eventmodules));
-                pmodule != NULL; 
-                pmodule = (FcitxAddon**) utarray_next(&instance->eventmodules, pmodule)) {
-            printf("%x\n", (*pmodule)->addonInstance);
-            printf("key is %s: %d\n", buf1, sym);
-
-            FcitxSimpleSendAndHandle(instance, false, sym, state, 0, (*pmodule)->addonInstance);
-        }
-
-        /*continue;*/
-        /*if (FcitxSimpleSendKeyEvent(instance, false, sym, state, 0) == 0) {*/
-            /*fprintf(stderr, "FORWARD:%s\n", buf1);*/
-        /*}*/
-
+    unsigned char buffer[100];
+    fread(buffer, sizeof(buffer), 1, fp);
+    int i=0;
+    for( i=0; i<sizeof(buffer)/sizeof(int); i++)
+    {
+        int key = *(int*)(buffer+sizeof(int)*i);
+        char *keyStr = getKeyStringbyInt(key);
+        if(!keyStr)continue; // if not this check, FcitxHotkeyParseKey will crash.
+        ParseKey(keyStr);
         usleep(1000);
     }
 
-    FcitxSimpleEnd(instance);
-    FcitxInstanceWaitForEnd(instance);
+    /*FcitxSimpleEnd(instance);*/
+    /*FcitxInstanceWaitForEnd(instance);*/
     ret = 0;
 option_error_end:
     if (fd >= 0)
