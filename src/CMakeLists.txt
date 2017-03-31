@@ -48,3 +48,23 @@ target_link_libraries(fcitx-simple-common ${FCITX4_FCITX_UTILS_LIBRARIES} ${PTHR
 target_link_libraries(fcitx-simple fcitx-simple-common ${FCITX4_FCITX_LIBRARIES} ${FCITX4_FCITX_UTILS_LIBRARIES} ${PTHREAD_LIBRARIES})
 
 install(TARGETS fcitx-simple fcitx-simple-common DESTINATION ${LIB_INSTALL_DIR})
+
+
+add_library(fcitx-simple-common-static STATIC ${fcitx_simple_common_SOURCES})
+set_target_properties(fcitx-simple-common-static PROPERTIES
+    OUTPUT_NAME "fcitx-simple-common-static"
+    PREFIX "lib")
+install(TARGETS fcitx-simple-common-static DESTINATION ${LIB_INSTALL_DIR})
+
+add_library(fcitx-simple-static STATIC ${fcitx_simple_SOURCES})
+set_target_properties(fcitx-simple-static PROPERTIES
+    OUTPUT_NAME "fcitx-simple-static"
+    PREFIX "lib")
+install(TARGETS fcitx-simple-static DESTINATION ${LIB_INSTALL_DIR})
+
+
+
+
+
+
+
