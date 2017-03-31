@@ -33,7 +33,7 @@ typedef struct _KEY_LIST {
 } KEY_LIST;
 
 /* fcitx key name translist */
-KEY_LIST        keyList[] = {
+KEY_LIST        xkeyList[] = {
     {"TAB", FcitxKey_Tab},
     {"ENTER", FcitxKey_Return},
     {"LCTRL", FcitxKey_Control_L},

@@ -29,6 +29,8 @@
 #include "simple-api.h"
 #include "hotkey-list.h"
 
+#include <fcitx-utils/memory.h>
+
 FcitxInstance* instance = NULL;
 
 static void usage() {
@@ -39,6 +41,7 @@ static void usage() {
             "\t-h\t\tdisplay this help and exit\n"
             "<addonname> is a comma separated list\n"
             "if inputfile is not specified, it will read stdin as input\n");
+    /*FcitxMemoryPool *pool = fcitx_memory_pool_create();*/
 }
 
 static void TestbedCallback(void* arg, FcitxSimpleEvent* event) {
@@ -123,11 +126,11 @@ char* getKeyStringbyInt(int index)
     }
     int i = 0;
     while(1) {
-        if(!keyList[i].code)
+        if(!xkeyList[i].code)
             break;
 
-        if(keyList[i].code == index)
-            return strdup(keyList[i].strKey);
+        if(xkeyList[i].code == index)
+            return strdup(xkeyList[i].strKey);
 
         i++;
     }
@@ -258,12 +261,12 @@ option_error_end:
     if (ret)
         usage();
 
-    fcitx_utils_free(imname);
-    fcitx_utils_free(buf);
-    fcitx_utils_free(buf1);
-    fcitx_utils_free(enableAddon);
-    fcitx_utils_free(addonList);
-    fcitx_utils_free(sandboxDirectory);
+    /*fcitx_utils_free(imname);*/
+    /*fcitx_utils_free(buf);*/
+    /*fcitx_utils_free(buf1);*/
+    /*fcitx_utils_free(enableAddon);*/
+    /*fcitx_utils_free(addonList);*/
+    /*fcitx_utils_free(sandboxDirectory);*/
     return ret;
 }
 // kate: indent-mode cstyle; space-indent on; indent-width 0;
