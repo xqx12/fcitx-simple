@@ -107,7 +107,7 @@ int ParseKey(char* buf)
     for( pmodule = (FcitxAddon**) utarray_front(&(instance->eventmodules));
             pmodule != NULL; 
             pmodule = (FcitxAddon**) utarray_next(&instance->eventmodules, pmodule)) {
-        printf("%x\n", (*pmodule)->addonInstance);
+        /*printf("%x\n", (*pmodule)->addonInstance);*/
         printf("key is %s: %d\n", buf, sym);
 
         FcitxSimpleSendAndHandle(instance, false, sym, state, 0, (*pmodule)->addonInstance);
@@ -135,6 +135,22 @@ char* getKeyStringbyInt(int index)
         i++;
     }
     return NULL;
+}
+
+int SetCurrentIM(char *imname)
+{
+	if( !instance ) {
+		printf("SetCurrentIM failed\n");
+		return -1;
+	}
+	FcitxProfile* profile = FcitxInstanceGetProfile(instance);
+	if( profile->imList) {
+		free(profile->imList);
+	}
+
+	asprintf(&profile->imList, "%s:True", imname);
+	FcitxInstanceUpdateIMList(instance);
+	FcitxInstanceSwitchIMByName(instance, imname);
 }
 
 int main(int argc, char* argv[])
@@ -234,7 +250,8 @@ int main(int argc, char* argv[])
     size_t len = 0;
 
     if (imname) {
-        FcitxSimpleSetCurrentIM(instance, imname);
+        /*FcitxSimpleSetCurrentIM(instance, imname);*/
+		SetCurrentIM(imname);
     }
     unsigned char buffer[100];
     fread(buffer, sizeof(buffer), 1, fp);

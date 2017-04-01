@@ -32,10 +32,10 @@
 #include "fcitx-utils/utarray.h"
 #include "fcitx-utils/utils.h"
 //#include "ui-internal.h"
-#include "configfile.h"
-#include "profile.h"
-#include "addon.h"
-#include "context.h"
+#include "fcitx/configfile.h"
+#include "fcitx/profile.h"
+#include "fcitx/addon.h"
+#include "fcitx/context.h"
 
 typedef struct _UnusedIMItem {
     char* name;
