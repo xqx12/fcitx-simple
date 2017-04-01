@@ -4,28 +4,21 @@
 # Author: Qixue Xiao <xiaoqixue_1@163.com>
 #Description: 
 
+ROOTDIR=/data/xqx/tests/fcitx-fuzz
 
-cd fcitx
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$ROOTDIR/fcitx/build-4283/install-bin/lib/pkgconfig
+export PATH=$PATH:$ROOTDIR/fcitx/build-4283/install-bin/bin
+export CMAKE_PREFIX_PATH=$ROOTDIR/fcitx/build-4283/install-bin
+
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/fcitx/build-4283/install-bin/include
+
+
+
+cd fcitx-simple
 mkdir build
 cd build
-mkdir install-bin
-cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/install-bin -DENABLE_TEST=ON -DENABLE_DEBUG=ON
-#CC=wllvm CXX=wllvm++ cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/llvm-obj  -DENABLE_STATIC=ON
-
-#export afl path
-#CC=afl-gcc CXX=afl-g++ cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/afl-obj  -DENABLE_STATIC=ON
-
-# patch -P1 build-c99.patch
-
-###  use for libiconv link
-#if [ ! -f src/lib/fcitx-utils/CMakeFiles/fcitx-utils.dir/link.txt ]
-#then
-    #echo "wrong dir, file not found for patch"
-#else
-    #sed -i 's/$/& -liconv/g' src/lib/fcitx-utils/CMakeFiles/fcitx-utils.dir/link.txt
-    #sed -i 's/$/& -liconv/g' tools/cli/CMakeFiles/scel2org.dir/link.txt
-#fi
-
+cmake .. -DCMAKE_INSTALL_PREFIX="/home/xqx/tests/fcitx-fuzz/fcitx/afl-build/afl-obj" \
+#    -DLIB_INSTALL_DIR=/home/xqx/tests/fcitx-fuzz/fcitx/afl-build/afl-obj/lib
 
 make 
 make install
