@@ -13,8 +13,23 @@ sudo apt-get install libxkbfile-dev \
     
 sudo apt-get install qt-sdk bison
 sudo apt-get install cmake extra-cmake-modules
+sudo apt-get install libicu-dev
+sudo apt-get install libqt4-dev
 
-wget http://xkbcommon.org/download/libxkbcommon-0.5.0.tar.xz
+# install extra-cmake-modules
+#git clone git://anongit.kde.org/extra-cmake-modules
+#cd extra-cmake-modules
+#mkdir build && cd build    
+#cmake ..
+#make && sudo make install
+#cd ../..
+
+
+if [ ! -f libxkbcommon-0.5.0.tar.xz ]
+then
+  wget http://xkbcommon.org/download/libxkbcommon-0.5.0.tar.xz
+fi
+
 if [ ! -d libxkcommon-0.5.0 ]
 then
     tar xvf libxkbcommon-0.5.0.tar.xz
