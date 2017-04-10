@@ -82,12 +82,12 @@ void FcitxSimpleEnd(FcitxInstance* instance)
 }
 
 FCITX_EXPORT_API
-int FcitxSimpleSendAndHandle(FcitxInstance *instance, boolean release, FcitxKeySym key, 
+int FcitxSimpleSendAndHandle(FcitxInstance *instance, boolean release, unsigned int key, 
         unsigned int state, unsigned int keycode, void* fm)
 {
     FcitxSimpleRequest request;
     request.type = release ? SE_KeyEventRelease : SE_KeyEventPress;
-    request.key = key;
+    request.key = (FcitxKeySym )key;
     request.state = state;
     request.keycode = keycode;
 

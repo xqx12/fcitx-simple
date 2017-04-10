@@ -32,6 +32,10 @@
 #include <fcitx-utils/memory.h>
 
 FcitxInstance* instance = NULL;
+typedef struct _KEYSTR {
+    unsigned int key;
+    unsigned int status;
+}KEYSTR,*pKEYSTR;
 
 static void usage() {
     fprintf(stderr,
@@ -95,6 +99,26 @@ static void TestbedCallback(void* arg, FcitxSimpleEvent* event) {
 #undef TESTBED_CASE
 }
 
+int ParseKeyStr(pKEYSTR keystr)
+{
+    if( !instance ) return -1;
+
+    if( !keystr ) return -1;
+    /*FcitxKeySym sym = FcitxKey_None;*/
+    /*unsigned int state = 0;*/
+    /*FcitxHotkeyParseKey(buf, &sym, &state);*/
+
+    FcitxAddon **pmodule;
+    for( pmodule = (FcitxAddon**) utarray_front(&(instance->eventmodules));
+            pmodule != NULL; 
+            pmodule = (FcitxAddon**) utarray_next(&instance->eventmodules, pmodule)) {
+        /*printf("%x\n", (*pmodule)->addonInstance);*/
+        printf("key is %x: %x\n", keystr->key, keystr->status);
+
+        FcitxSimpleSendAndHandle(instance, false, (keystr->key), keystr->status, 0, (*pmodule)->addonInstance);
+    }
+
+}
 int ParseKey(char* buf)
 {
     if( !instance ) return -1;
@@ -185,14 +209,18 @@ int main(int argc, char* argv[])
         }
     }
 
+    if(imname==NULL)
+        imname = strdup("pinyin");
+
     /* processs [addon list] */
-    if (optind >= argc)
-        goto option_error_end;
-    addonList = strdup(argv[optind]);
+    /*if (optind >= argc)*/
+        /*goto option_error_end;*/
+    /*addonList = strdup(argv[optind]);*/
+    addonList = strdup("fcitx-pinyin");
 
     /* script file */
-    if (optind + 1 < argc) {
-        fp = fopen(argv[optind + 1], "rt");
+    if (optind  < argc) {
+        fp = fopen(argv[optind ], "rt");
     }
     else {
         fp = stdin;
@@ -253,15 +281,18 @@ int main(int argc, char* argv[])
         /*FcitxSimpleSetCurrentIM(instance, imname);*/
 		SetCurrentIM(imname);
     }
-    unsigned char buffer[100];
-    fread(buffer, sizeof(buffer), 1, fp);
+
+    unsigned char buffer[1024];
+    int numreaded= 0 ;
+    numreaded = fread(buffer, sizeof(KEYSTR), 100, fp);
+    if(!numreaded) return -2;
+    /*klee_make_symbolic(buffer, sizeof(buffer), "keybuf");*/
     int i=0;
-    for( i=0; i<sizeof(buffer)/sizeof(int); i++)
+    for( i=0; i<numreaded; i++)
     {
-        int key = *(int*)(buffer+sizeof(int)*i);
-        char *keyStr = getKeyStringbyInt(key);
-        if(!keyStr)continue; // if not this check, FcitxHotkeyParseKey will crash.
-        ParseKey(keyStr);
+        pKEYSTR keystr = (pKEYSTR)(buffer+sizeof(KEYSTR)*i);
+        if(!keystr)continue; // if not this check, FcitxHotkeyParseKey will crash.
+        ParseKeyStr(keystr);
         usleep(1000);
     }
 

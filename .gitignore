@@ -2,6 +2,7 @@
 build*/
 gbuild*/
 afl-build*/
+llvm-build*/
 .*
 !.git*
 .git/

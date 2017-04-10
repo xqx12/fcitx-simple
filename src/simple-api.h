@@ -39,7 +39,7 @@ void FcitxSimpleTriggerMenuItem(FcitxInstance* instance, const char* name, int i
 
 void FcitxSimpleEnd(FcitxInstance* instance);
 
-int FcitxSimpleSendAndHandle(FcitxInstance *instance, boolean release, FcitxKeySym key, unsigned int state, unsigned int keycode, void* fm);
+int FcitxSimpleSendAndHandle(FcitxInstance *instance, boolean release, unsigned int key, unsigned int state, unsigned int keycode, void* fm);
 
 #ifdef __cplusplus
 }
